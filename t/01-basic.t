@@ -64,8 +64,8 @@ test_tcp(
     set template => 'template_toolkit';
 
     if( $Dancer2::VERSION < 0.14 ){
-        Dancer2->runner->server->port($port);    }
-    else {
+        Dancer2->runner->server->port($port);
+    } else {
         Dancer2->runner->{'port'} = $port;
     }
     @{engine('template')->config}{qw(start_tag end_tag)} = qw(<% %>);

@@ -62,9 +62,12 @@ test_tcp(
     set confdir  => '.';
     set port     => $port, startup_info => 0;
     set template => 'template_toolkit';
-    #set views => path( '.', 't', 'views' );
 
-    Dancer2->runner->server->port($port);
+    if( $Dancer2::VERSION < 0.14 ){
+        Dancer2->runner->server->port($port);    }
+    else {
+        Dancer2->runner->{'port'} = $port;
+    }
     @{engine('template')->config}{qw(start_tag end_tag)} = qw(<% %>);
 
 

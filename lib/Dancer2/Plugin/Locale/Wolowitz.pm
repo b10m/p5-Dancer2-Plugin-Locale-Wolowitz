@@ -9,7 +9,7 @@ use Dancer2::FileUtils;
 use Dancer2::Plugin;
 use Locale::Wolowitz;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $wolowitz;
 my $conf;

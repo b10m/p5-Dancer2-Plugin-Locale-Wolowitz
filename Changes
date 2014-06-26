@@ -1,5 +1,7 @@
 Revision history for Dancer2-Plugin-Locale-Wolowitz
 
-0.01    Date/time
+0.02    2014-06-26
+        Test patched for Dancer2 > 0.14 support
+0.01    2014-06-26
         First version, released on an unsuspecting world.
 

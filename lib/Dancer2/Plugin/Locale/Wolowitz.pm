@@ -93,8 +93,12 @@ sub _path_directory_locale {
     my $dsl = shift;
 
     $conf ||= plugin_setting();
-    return $conf->{locale_path_directory}
-           // Dancer2::FileUtils::path($dsl->setting('appdir'), 'i18n');
+
+    my $dir = $conf->{locale_path_directory} // 'i18n';
+    unless (-d $dir) {
+        $dir = Dancer2::FileUtils::path($dsl->setting('appdir'), $dir);
+    }
+    return $dir;
 }
 
 sub _lang {

@@ -54,6 +54,17 @@ test_tcp(
     $res = $ua->get($url . '/tmpl/complex_key');
     is $res->content,  "Repertoire $path non trouve", 'check complex key french (tmpl)';
 
+    # and test allowed langs
+    $ua->cookie_jar({});
+    $ua->default_header('Accept-Language' => "it,de;q=0.8,es;q=0.5");
+    $res = $ua->get($url . '/tmpl');
+    is $res->content, 'Welcome', 'check simple key english (fallback)';
+
+    $ua->cookie_jar({});
+    $ua->default_header('Accept-Language' => "it,de;q=0.8,es;q=0.5,fr;0.2");
+    $res = $ua->get($url . '/tmpl');
+    is $res->content, 'Bienvenue', 'check simple key french (accept-language)';
+
   },
 
   server => sub {
@@ -62,6 +73,12 @@ test_tcp(
     set confdir  => '.';
     set port     => $port, startup_info => 0;
     set template => 'template_toolkit';
+    set plugins  => {
+        'Locale::Wolowitz' => {
+            fallback  => "en",
+            lang_available => [ qw( en fr ) ],
+        }
+    };
 
     if( $Dancer2::VERSION < 0.14 ){
         Dancer2->runner->server->port($port);

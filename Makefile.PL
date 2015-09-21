@@ -21,6 +21,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Dancer2'          => "0",
         'Locale::Wolowitz' => "0",
+        'I18N::AcceptLanguage' => "0",
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Dancer2-Plugin-Locale-Wolowitz-*' },

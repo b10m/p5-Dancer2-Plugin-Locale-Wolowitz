@@ -7,12 +7,12 @@ use warnings;
 use Dancer2;
 use Dancer2::FileUtils;
 use Dancer2::Plugin;
+use I18N::AcceptLanguage;
 use Locale::Wolowitz;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $wolowitz;
-my $conf;
 
 =head1 NAME
 
@@ -49,8 +49,14 @@ for Dancer2 projects.
 
    plugins:
      Locale::Wolowitz:
-       lang_session: "lang"
+       fallback: "en"
        locale_path_directory: "i18n"
+       lang_session: "lang"
+       lang_available:
+         - de
+         - en
+         - id
+         - nl
 
 =cut
 
@@ -92,7 +98,7 @@ sub _loc {
 sub _path_directory_locale {
     my $dsl = shift;
 
-    $conf ||= plugin_setting();
+    my $conf = $dsl->{app}{config}{plugins}{'Locale::Wolowitz'};
 
     my $dir = $conf->{locale_path_directory} // 'i18n';
     unless (-d $dir) {
@@ -104,7 +110,7 @@ sub _path_directory_locale {
 sub _lang {
     my $dsl = shift;
 
-    $conf ||= plugin_setting();
+    my $conf = $dsl->{app}{config}{plugins}{'Locale::Wolowitz'};
     my $lang_session = $conf->{lang_session} || 'lang';
 
     if( $dsl->setting('session') ) {
@@ -112,8 +118,6 @@ sub _lang {
 
         if( !$session_language ) {
             $session_language = _detect_lang_from_browser($dsl);
-
-            $dsl->session( $lang_session => $session_language );
         }
 
         return $session_language;
@@ -125,11 +129,9 @@ sub _lang {
 sub _detect_lang_from_browser {
     my $dsl = shift;
 
-    my $lang = $dsl->request->accept_language || return;
-       $lang =~ s/-\w+//g;
-       $lang = (split(/,\s*/,$lang))[0];
-
-    return $lang;
+    my $conf = $dsl->{app}{config}{plugins}{'Locale::Wolowitz'};
+    my $acceptor = I18N::AcceptLanguage->new(defaultLanguage => $conf->{fallback} // "");
+    return $acceptor->accepts($dsl->request->accept_language, $conf->{lang_available});
 }
 
 =head1 AUTHOR

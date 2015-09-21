@@ -33,8 +33,14 @@ for Dancer2 projects.
 
     plugins:
       Locale::Wolowitz:
-        lang_session: "lang"
+        fallback: "en"
         locale_path_directory: "i18n"
+        lang_session: "lang"
+        lang_available:
+          - de
+          - en
+          - id
+          - nl
 
 # KEYWORDS
 

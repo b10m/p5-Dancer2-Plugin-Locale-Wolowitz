@@ -1,0 +1,76 @@
+{
+   "abstract" : "Dancer2's plugin for Locale::Wolowitz",
+   "author" : [
+      "Menno Blom, C<< <blom at cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Locale-Wolowitz",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::TCP" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0",
+            "I18N::AcceptLanguage" : "0",
+            "Locale::Wolowitz" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/b10m/p5-Dancer2-Plugin-Locale-Wolowitz/issues"
+      },
+      "homepage" : "https://github.com/b10m/p5-Dancer2-Plugin-Locale-Wolowitz",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/b10m/p5-Dancer2-Plugin-Locale-Wolowitz.git",
+         "web" : "https://github.com/b10m/p5-Dancer2-Plugin-Locale-Wolowitz"
+      }
+   },
+   "version" : "0.03",
+   "x_contributors" : [
+      "Menno Blom <blom@cpan.org>",
+      "Bas Bloemsaat <bas@bloemsaat.com>",
+      "B10m <menno@b10m.net>"
+   ]
+}

@@ -11,9 +11,15 @@ Build.bat
 /Makefile.old
 /MANIFEST.bak
 /META.yml
-/META.json
 /MYMETA.*
 nytprof.out
 /pm_to_blib
 *.o
 *.bs
+/Dancer2-Plugin-Locale-Wolowitz-*
+/.build
+/_build_params
+/Build
+/Build.bat
+!META.json
+!LICENSE

@@ -4,7 +4,6 @@ use 5.010;
 use strict;
 use warnings;
 
-use Dancer2;
 use Dancer2::FileUtils;
 use Dancer2::Plugin;
 use I18N::AcceptLanguage;
@@ -66,7 +65,7 @@ on_plugin_import {
 
     $dsl->app->add_hook(
         Dancer2::Core::Hook->new(
-            name => 'before_template',
+            name => 'before_template_render',
             code => sub {
                 my $tokens = shift;
                 $tokens->{l} = sub { _loc($dsl, @_); };
@@ -102,7 +101,7 @@ sub _path_directory_locale {
 
     my $dir = $conf->{locale_path_directory} // 'i18n';
     unless (-d $dir) {
-        $dir = Dancer2::FileUtils::path($dsl->setting('appdir'), $dir);
+        $dir = Dancer2::FileUtils::path($dsl->app->setting('appdir'), $dir);
     }
     return $dir;
 }
@@ -113,8 +112,8 @@ sub _lang {
     my $conf = $dsl->{app}{config}{plugins}{'Locale::Wolowitz'};
     my $lang_session = $conf->{lang_session} || 'lang';
 
-    if( $dsl->setting('session') ) {
-        my $session_language = $dsl->session( $lang_session );
+    if( $dsl->app->has_session ) {
+        my $session_language = $dsl->app->session->read( $lang_session );
 
         if( !$session_language ) {
             $session_language = _detect_lang_from_browser($dsl);
@@ -131,7 +130,7 @@ sub _detect_lang_from_browser {
 
     my $conf = $dsl->{app}{config}{plugins}{'Locale::Wolowitz'};
     my $acceptor = I18N::AcceptLanguage->new(defaultLanguage => $conf->{fallback} // "");
-    return $acceptor->accepts($dsl->request->accept_language, $conf->{lang_available});
+    return $acceptor->accepts($dsl->app->request->accept_language, $conf->{lang_available});
 }
 
 =head1 AUTHOR
@@ -162,6 +161,6 @@ it under the same terms as Perl itself.
 
 =cut
 
-register_plugin for_versions => [ 2 ] ;
+register_plugin;
 
 1; # End of Dancer2::Plugin::Locale::Wolowitz

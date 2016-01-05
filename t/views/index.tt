@@ -1,1 +1,1 @@
-<% l('welcome') -%>
+[% l('welcome') -%]

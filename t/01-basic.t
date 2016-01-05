@@ -1,78 +1,20 @@
 use strict;
 use warnings;
 
+use HTTP::Request::Common;
+use Plack::Test;
 use Test::More 0.96 import => ['!pass'];
-use Test::TCP;
 
-use Dancer2;
-use Dancer2::Plugin::Locale::Wolowitz;
-use LWP::UserAgent;
-
-test_tcp(
-  client => sub {
-    my $port = shift;
-    my $url = "http://localhost:$port";
-
-    my $ua = LWP::UserAgent->new( cookie_jar => {} );
-    my $res;
-
-    $res = $ua->get($url . "/?lang=en");
-    is $res->content, 'Welcome', 'check simple key english';
-
-    $res = $ua->get($url . "/tmpl");
-    is $res->content, 'Welcome', 'check simple key english (tmpl)';
-
-    $res = $ua->get($url . "/no_key");
-    is $res->content, 'hello', 'check no key found english';
-
-    $res = $ua->get($url . "/tmpl/no_key");
-    is $res->content, 'hello', 'check no key found english (tmpl)';
-
-    my $path = setting('appdir');
-    $res = $ua->get($url . '/complex_key');
-    is $res->content,  "$path not found", 'check complex key english';
-
-    $res = $ua->get($url . '/tmpl/complex_key');
-    is $res->content,  "$path not found", 'check complex key english (tmpl)';
-
-    # and now for something completely different
-    $res = $ua->get($url . "/?lang=fr");
-    is $res->content, 'Bienvenue', 'check simple key french';
-
-    $res = $ua->get($url . "/tmpl");
-    is $res->content, 'Bienvenue', 'check simple key french (tmpl)';
-
-    $res = $ua->get($url . "/no_key");
-    is $res->content, 'hello', 'check no key found french';
-
-    $res = $ua->get($url . "/tmpl/no_key");
-    is $res->content, 'hello', 'check no key found french (tmpl)';
-
-    $res = $ua->get($url . '/complex_key');
-    is $res->content,  "Repertoire $path non trouve", 'check complex key french';
-
-    $res = $ua->get($url . '/tmpl/complex_key');
-    is $res->content,  "Repertoire $path non trouve", 'check complex key french (tmpl)';
-
-    # and test allowed langs
-    $ua->cookie_jar({});
-    $ua->default_header('Accept-Language' => "it,de;q=0.8,es;q=0.5");
-    $res = $ua->get($url . '/tmpl');
-    is $res->content, 'Welcome', 'check simple key english (fallback)';
-
-    $ua->cookie_jar({});
-    $ua->default_header('Accept-Language' => "it,de;q=0.8,es;q=0.5,fr;0.2");
-    $res = $ua->get($url . '/tmpl');
-    is $res->content, 'Bienvenue', 'check simple key french (accept-language)';
-
-  },
-
-  server => sub {
-    my $port = shift;
+{
+    package App;
+    use Dancer2;
+    use Dancer2::Plugin::Locale::Wolowitz;
 
     set confdir  => '.';
-    set port     => $port, startup_info => 0;
-    set template => 'template_toolkit';
+    set template=> 'template_toolkit';
+    set engines => {
+        session => 'Simple',
+    };
     set plugins  => {
         'Locale::Wolowitz' => {
             fallback  => "en",
@@ -80,15 +22,9 @@ test_tcp(
         }
     };
 
-    if( $Dancer2::VERSION < 0.14 ){
-        Dancer2->runner->server->port($port);
-    } else {
-        Dancer2->runner->{'port'} = $port;
-    }
-    @{engine('template')->config}{qw(start_tag end_tag)} = qw(<% %>);
-
-
-    set session => 'Simple';
+    hook 'before_template_render' => sub {
+        my $tokens = shift;
+    };
 
     get '/' => sub {
         session lang => param('lang');
@@ -97,7 +33,7 @@ test_tcp(
     };
 
     get '/tmpl' => sub {
-        template 'index', {}, { layout => undef };;
+        template 'index', {}, { layout => undef };
     };
 
     get '/no_key' => sub {
@@ -109,6 +45,10 @@ test_tcp(
         template 'no_key';
     };
 
+    get '/appdir' => sub {
+        return setting('appdir');
+    };
+
     get '/complex_key' => sub {
         my $tr = loc('path_not_found %1', [setting('appdir')]);
         return $tr;
@@ -118,8 +58,60 @@ test_tcp(
         template 'complex_key', { appdir => setting('appdir') };
     };
 
-    start;
-  },
-);
+    true;
+}
+
+my $test = Plack::Test->create( App->to_app );
+
+my $res = $test->request(GET "/?lang=en");
+is $res->content, 'Welcome', 'check simple key english';
+
+my $cookie = $res->{_headers}{'set-cookie'};
+   $cookie =~ s/;.*$//;
+
+$res = $test->request(GET "/tmpl", Cookie => $cookie);
+is $res->content, 'Welcome', 'check simple key english (tmpl)';
+
+$res = $test->request(GET "/no_key", Cookie => $cookie);
+is $res->content, 'hello', 'check no key found english';
+
+$res = $test->request(GET "/tmpl/no_key", Cookie => $cookie);
+is $res->content, 'hello', 'check no key found english (tmpl)';
+
+$res = $test->request(GET "/appdir", Cookie => $cookie);
+my $path = $res->content;
+
+$res = $test->request(GET '/complex_key', Cookie => $cookie);
+is $res->content,  "$path not found", 'check complex key english';
+
+$res = $test->request(GET '/tmpl/complex_key', Cookie => $cookie);
+is $res->content,  "$path not found", 'check complex key english (tmpl)';
+
+# and now for something completely different
+$res = $test->request(GET "/?lang=fr", Cookie => $cookie);
+is $res->content, 'Bienvenue', 'check simple key french';
+
+$res = $test->request(GET "/tmpl", Cookie => $cookie);
+is $res->content, 'Bienvenue', 'check simple key french (tmpl)';
+
+$res = $test->request(GET "/no_key", Cookie => $cookie);
+is $res->content, 'hello', 'check no key found french';
+
+$res = $test->request(GET "/tmpl/no_key", Cookie => $cookie);
+is $res->content, 'hello', 'check no key found french (tmpl)';
+
+$res = $test->request(GET '/complex_key', Cookie => $cookie);
+is $res->content,  "Repertoire $path non trouve", 'check complex key french';
+
+$res = $test->request(GET '/tmpl/complex_key', Cookie => $cookie);
+is $res->content,  "Repertoire $path non trouve", 'check complex key french (tmpl)';
+
+# and test allowed langs
+$res = $test->request(GET '/tmpl', 'Accept-Language' => "it,de;q=0.8,es;q=0.5");
+is $res->content, 'Welcome', 'check simple key english (fallback)';
+
+$res = $test->request(GET '/tmpl', 'Accept-Language' => "it,de;q=0.8,es;q=0.5,fr;0.2");
+is $res->content, 'Bienvenue', 'check simple key french (accept-language)';
 
 done_testing;
+

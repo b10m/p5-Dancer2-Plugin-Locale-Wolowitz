@@ -9,7 +9,7 @@ use Dancer2::Plugin;
 use I18N::AcceptLanguage;
 use Locale::Wolowitz;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $wolowitz;
 

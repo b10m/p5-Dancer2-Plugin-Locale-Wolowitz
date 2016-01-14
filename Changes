@@ -1,5 +1,11 @@
 Revision history for Dancer2-Plugin-Locale-Wolowitz
 
+{{$NEXT}}
+
+0.04  2016-01-14 15:11:19 CET
+        Fix for new plugin framework
+        Move to Plack::Test
+        Require Dancer2 0.166000
 0.03    2015-09-21
         Use relative path (Bas Bloemsaat)
         Better browser header handling with I18N::AcceptLanguage

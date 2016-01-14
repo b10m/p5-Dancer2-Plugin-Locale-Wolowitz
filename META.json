@@ -43,7 +43,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Dancer2" : "0",
+            "Dancer2" : "0.166",
             "I18N::AcceptLanguage" : "0",
             "Locale::Wolowitz" : "0",
             "perl" : "5.001"

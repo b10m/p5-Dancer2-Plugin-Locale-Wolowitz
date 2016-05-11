@@ -86,10 +86,10 @@ templates you can use the C<l('')> function
 register loc => \&_loc;
 
 sub _loc {
-    my ($dsl, $str, $args) = @_;
+    my ($dsl, $str, $args, $force_lang) = @_;
 
     $wolowitz ||= Locale::Wolowitz->new(_path_directory_locale($dsl));
-    my $lang    = _lang($dsl);
+    my $lang    = $force_lang || _lang($dsl);
 
     return $wolowitz->loc($str, $lang, @$args);
 };

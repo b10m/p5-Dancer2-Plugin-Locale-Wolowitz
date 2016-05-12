@@ -57,6 +57,15 @@ use Test::More 0.96 import => ['!pass'];
     get '/tmpl/complex_key' => sub {
         template 'complex_key', { appdir => setting('appdir') };
     };
+    
+    get '/force_lang' => sub {
+        my $tr = loc('welcome', undef, 'en');
+        return $tr;
+    };
+    
+    get '/tmpl/force_lang' => sub {
+        template 'force_lang'
+    };
 
     true;
 }
@@ -112,6 +121,12 @@ is $res->content, 'Welcome', 'check simple key english (fallback)';
 
 $res = $test->request(GET '/tmpl', 'Accept-Language' => "it,de;q=0.8,es;q=0.5,fr;0.2");
 is $res->content, 'Bienvenue', 'check simple key french (accept-language)';
+
+$res = $test->request(GET '/force_lang', 'Accept-Language' => "it,de;q=0.8,es;q=0.5,fr;0.2");
+is $res->content, 'Welcome', 'check simple key force English';
+
+$res = $test->request(GET '/tmpl/force_lang', 'Accept-Language' => "it,de;q=0.8,es;q=0.5,fr;0.2");
+is $res->content, 'Welcome', 'check simple key force English';
 
 done_testing;
 

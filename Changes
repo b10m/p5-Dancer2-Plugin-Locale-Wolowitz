@@ -2,6 +2,9 @@ Revision history for Dancer2-Plugin-Locale-Wolowitz
 
 {{$NEXT}}
 
+0.05  2016-06-04 13:26:07 CEST
+        Support the third parameter to loc as documented in the original Dancer plugin (thanks to Evan Brown!)
+
 0.04  2016-01-14 15:11:19 CET
         Fix for new plugin framework
         Move to Plack::Test
